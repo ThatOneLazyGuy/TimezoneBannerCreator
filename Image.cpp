@@ -228,7 +228,9 @@ namespace Image
 
 	void Image::UI()
 	{
-		if (ImGui::DragInt2("Size", &size.x, 0.25f)) size = { std::min<int>(0, size.x), std::min<int>(0, size.y) };
+		if (ImGui::DragInt2("Size", &size.x, 0.25f)) size = { std::max<int>(0, size.x), std::max<int>(0, size.y) };
+		ImGui::SameLine();
+		if (ImGui::Button("Reset")) size = { width, height };
 
 		ImVec4 temp_color = ImGui::ColorConvertU32ToFloat4(color);
 		if (ImGui::ColorEdit4("Color", &temp_color.x)) SetColor(ImGui::ColorConvertFloat4ToU32(temp_color));

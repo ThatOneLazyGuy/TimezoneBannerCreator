@@ -311,6 +311,7 @@ namespace UI
 		}
 
 		ImVec2 working_area{};
+		bool has_center_view = false;
 	}
 
 	void UpdateScale()
@@ -394,6 +395,15 @@ namespace UI
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0.0f, 0.0f });
 		if (ImGui::Begin("##Editor window", nullptr, edit_window_flags))
 		{
+			// Hacky work around to center the view one time after selecting a canvas image
+			if (!has_center_view && working_area.x * working_area.y != 0.0f)
+			{
+				ImGui::SetScrollX(ImGui::GetScrollMaxX() / 2.0f);
+				ImGui::SetScrollY(ImGui::GetScrollMaxY() / 2.0f);
+
+				has_center_view = true;
+			}
+
 			EditorInput();
 		}
 		ImGui::End();
