@@ -430,7 +430,7 @@ namespace UI
 
 		ImGui::SetNextWindowSize(ImGui::GetMainViewport()->Size / ImVec2{ 6.0f, 4.0f });
 		ImGui::SetNextWindowPos(ImVec2{ ImGui::GetMainViewport()->Size / 2.0f - ImGui::GetCurrentContext()->NextWindowData.SizeVal / 2.0f });
-		if (ImGui::BeginPopupModal("Exporting", nullptr,  ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings))
+		if (ImGui::BeginPopupModal("Exporting", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings))
 		{
 			const std::string text = "Exporting image...";
 			const ImVec2 text_size = ImGui::CalcTextSize(text.c_str());

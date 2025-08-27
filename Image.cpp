@@ -488,8 +488,7 @@ namespace Image
 				ImGui::TableSetupColumn("Description");
 				ImGui::TableHeadersRow();
 
-				// TODO: Make this a table
-				const local_time time_point = date_time.GetTimePoint();
+				const zoned_time zoned_time = date_time.GetZonedTime();
 				for (const auto& formatter : DateTime::date_time_formatters)
 				{
 					ImGui::TableNextRow();
@@ -501,9 +500,7 @@ namespace Image
 					ImGui::PushID(formatter.custom_format.data());
 
 					std::string formatted_date_time{ formatter.replacement_format };
-					formatted_date_time = std::vformat("{:" + formatted_date_time += '}', std::make_format_args(time_point));
-					//ImGui::SetNextItemWidth(ImGui::CalcTextSize(formatted_date_time.c_str()).x + ImGui::GetStyle().FramePadding.x * 2.0f);
-					//ImGui::InputText("##test", &formatted_date_time, ImGuiInputTextFlags_ReadOnly);
+					formatted_date_time = std::vformat("{:" + formatted_date_time += '}', std::make_format_args(zoned_time));
 					ImGui::Text("%s", formatted_date_time.c_str());
 
 					ImGui::PopID();
@@ -512,6 +509,17 @@ namespace Image
 					ImGui::Text("%s", formatter.description.data());
 
 				}
+
+				ImGui::TableNextRow();
+
+				ImGui::TableSetColumnIndex(0);
+				ImGui::Text("TMZCITY");
+
+				ImGui::TableSetColumnIndex(1);
+				ImGui::Text("%s", current_zone()->name().data());
+
+				ImGui::TableSetColumnIndex(2);
+				ImGui::Text("The time zone's city name");
 
 				ImGui::EndTable();
 			}

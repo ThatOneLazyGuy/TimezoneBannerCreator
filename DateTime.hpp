@@ -24,7 +24,7 @@ namespace DateTime
 		{
 		}
 
-		[[nodiscard]] time_point<local_t, seconds> GetTimePoint() const { return local_days{ date } + time.to_duration(); }
+		[[nodiscard]] local_time<seconds> GetTimePoint() const { return local_days{ date } + time.to_duration(); }
 		[[nodiscard]] year_month_day GetDate() const { return date; }
 		[[nodiscard]] hh_mm_ss<seconds> GetTime() const { return time; }
 
@@ -38,12 +38,16 @@ namespace DateTime
 
 		local_seconds GetLocalizedTimePoint(const std::string_view& time_zone) const { return locate_zone(time_zone)->to_local(GetSystemTimePoint()); }
 
+		[[nodiscard]] zoned_time<seconds> GetZonedTime() const { return zoned_time{ timezone, GetTimePoint() }; }
+		[[nodiscard]] zoned_time<seconds> GetLocalizedZonedTime(const std::string_view& time_zone) const { return zoned_time{ time_zone, GetLocalizedTimePoint(time_zone) }; }
+
+		const time_zone& GetTimeZone() const { return *locate_zone(timezone); }
+
 	private:
 		sys_seconds GetSystemTimePoint() const
 		{
 			return GetTimeZone().to_sys(GetTimePoint());
 		}
-		const time_zone& GetTimeZone() const { return *locate_zone(timezone); }
 
 		std::string_view timezone = current_zone()->name();
 		year_month_day date{};
@@ -66,7 +70,7 @@ namespace DateTime
 		std::string_view description;
 	};
 
-	constexpr std::array<DateTimeFormat, 22> date_time_formatters
+	constexpr std::array<DateTimeFormat, 25> date_time_formatters
 	{ {
 		{"DATETIME", "%c", "Full date and time"},
 		{"DATE", "%x", "Full date"},
@@ -94,10 +98,10 @@ namespace DateTime
 		{"YY", "%y", "Year (2 digits)"},
 
 		// ----------------------------
-		// TODO: Manually add these to the replace functions
-		// {"TZOF", "%z", "Timezone offset (e.g. +0230)"},
-		// {"TZ:OF", "%Ez", "Timezone offset with minute separator (e.g. +02:30)"},
-		// {"TZ", "%Z", "Timezone abbreviation"},
+
+		{"TZOF", "%z", "Timezone offset (e.g. +0230)"},
+		{"TZ:OF", "%Ez", "Timezone offset with minute separator (e.g. +02:30)"},
+		{"TZ", "%Z", "Timezone abbreviation"},
 
 		// -----------------------------
 

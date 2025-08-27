@@ -62,7 +62,7 @@ namespace DateTime
 		{
 			const std::string_view timezone_name = selected_timezones.at(i);
 			const std::string timezone_city = std::filesystem::path{ timezone_name }.filename().generic_string();
-			const local_time time_in_zone = date_time.GetLocalizedTimePoint(timezone_name);
+			const zoned_time time_in_zone = date_time.GetLocalizedZonedTime(timezone_name);
 
 			try
 			{
