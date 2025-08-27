@@ -544,7 +544,7 @@ namespace Image
 		if (IsValid()) SDL_DestroyTexture(target);
 	}
 
-	void Canvas::UpdateScaleAndOffset(const SDL_FPoint& working_area)
+	void Canvas::UpdateScaleAndOffset(const SDL_FPoint& working_area, const float menu_bar_height)
 	{
 		float canvas_height = static_cast<float>(image.GetHeight());
 		base_scale = working_area.y / canvas_height;
@@ -556,6 +556,7 @@ namespace Image
 		content_size = working_area + ImVec2{ std::max<float>(canvas_width, working_area.x), std::max<float>(canvas_height, working_area.y) };
 
 		render_offset = content_size / 2.0f - ImVec2{ canvas_width, canvas_height } / 2.0f;
+		render_offset.y += menu_bar_height;
 	}
 
 	std::future<void> Canvas::Export(std::string&& path) const

@@ -410,6 +410,11 @@ namespace UI
 		ImGui::PopStyleVar();
 
 
+		const ImVec2 items_window_offset = ImVec2{ ImGui::GetFontSize(), ImGui::GetFontSize() } *3.0f;
+		const ImVec2 items_window_size = ImVec2{ 30.0f, 22.5f } *ImGui::GetFontSize();
+
+		ImGui::SetNextWindowPos(ImGui::GetMainViewport()->Size - items_window_offset, ImGuiCond_FirstUseEver, ImVec2{ 1.0f, 1.0f });
+		ImGui::SetNextWindowSize(items_window_size, ImGuiCond_FirstUseEver);
 		if (ImGui::Begin("Image items", nullptr, ImGuiWindowFlags_MenuBar))
 		{
 			if (ImGui::BeginMenuBar())
@@ -430,6 +435,11 @@ namespace UI
 		}
 		ImGui::End();
 
+		const ImVec2 selection_window_offset = ImVec2{ -ImGui::GetFontSize(), ImGui::GetFontSize() } *3.0f + ImVec2{ ImGui::GetStyle().ScrollbarSize, 0.0f };
+		const ImVec2 selection_window_size = ImVec2{ 30.0f, 40.0f } *ImGui::GetFontSize();
+
+		ImGui::SetNextWindowPos(ImVec2{ 0.0f, ImGui::GetMainViewport()->Size.y } - selection_window_offset, ImGuiCond_FirstUseEver, ImVec2{ 0.0f, 1.0f });
+		ImGui::SetNextWindowSize(selection_window_size, ImGuiCond_FirstUseEver);
 		if (ImGui::Begin("Selected image"))
 		{
 			SelectedTextMenu();
@@ -457,13 +467,10 @@ namespace UI
 			ImGui::EndPopup();
 		}
 
-		int window_width, window_height;
-		SDL_GetRenderOutputSize(Renderer::GetRenderer(), &window_width, &window_height);
-
-		working_area = ImVec2{ static_cast<float>(window_width), static_cast<float>(window_height) };
+		working_area = ImGui::GetMainViewport()->Size;
 		working_area.y -= ImGui::GetFrameHeight() + ImGui::GetStyle().ScrollbarSize;
 
-		Image::canvas->UpdateScaleAndOffset(working_area);
+		Image::canvas->UpdateScaleAndOffset(working_area, ImGui::GetFrameHeight());
 
 		ImGui::Render();
 		ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), renderer);

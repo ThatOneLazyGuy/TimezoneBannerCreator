@@ -162,7 +162,7 @@ namespace Image
 		SDL_Texture* target{ nullptr };
 		Image image;
 
-		void UpdateScaleAndOffset(const SDL_FPoint& working_area);
+		void UpdateScaleAndOffset(const SDL_FPoint& working_area, float menu_bar_height);
 		[[nodiscard]] std::future<void> Export(std::string&& path) const;
 
 		float base_scale{ 1.0f };
