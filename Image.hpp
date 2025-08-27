@@ -125,16 +125,18 @@ namespace Image
 		std::string text{ "Text" };
 	};
 
-	class TimeText : public Text
+	class DateTimeText : public Text
 	{
 	public:
-		TimeText();
+		DateTimeText();
 
 		virtual void UI() override;
 
 	private:
 		virtual void CreateTextTexture() override;
 		bool UITimezoneSelector();
+
+		void UIFormatWindow(bool& show_format_window) const;
 
 		std::vector<std::string_view> timezones;
 		DateTime::DateTime date_time;
@@ -161,7 +163,7 @@ namespace Image
 		Image image;
 
 		void UpdateScaleAndOffset(const SDL_FPoint& working_area);
-		[[nodiscard]] std::future<void> ExportCanvas(std::string&& path) const;
+		[[nodiscard]] std::future<void> Export(std::string&& path) const;
 
 		float base_scale{ 1.0f };
 		SDL_FPoint render_offset{};

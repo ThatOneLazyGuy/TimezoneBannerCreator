@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <string>
 #include <chrono>
 
@@ -35,10 +36,10 @@ namespace DateTime
 			time = hh_mm_ss{ floor<seconds>(now - local_days) };
 		}
 
-		local_time<seconds> GetLocalizedTimePoint(const std::string_view& time_zone) const { return locate_zone(time_zone)->to_local(GetSystemTimePoint()); }
+		local_seconds GetLocalizedTimePoint(const std::string_view& time_zone) const { return locate_zone(time_zone)->to_local(GetSystemTimePoint()); }
 
 	private:
-		sys_time<seconds> GetSystemTimePoint() const
+		sys_seconds GetSystemTimePoint() const
 		{
 			return GetTimeZone().to_sys(GetTimePoint());
 		}
@@ -56,7 +57,58 @@ namespace DateTime
 		const time_point date_time = GetTimePoint();
 		return hh_mm_ss{ floor<seconds>(date_time - floor<days>(date_time)) };
 	}
-	std::string ReplaceTime(std::string format);
-	std::string UpdateText(const std::string& format, const std::vector<std::string_view>& selected_timezones, const DateTime& date_time, bool lower_am_pm = false);
+	std::string FormatDateTime(const std::string& string, const std::vector<std::string_view>& selected_timezones, const DateTime& date_time, bool lower_am_pm = false);
+
+	struct DateTimeFormat
+	{
+		std::string_view custom_format;
+		std::string_view replacement_format;
+		std::string_view description;
+	};
+
+	constexpr std::array<DateTimeFormat, 22> date_time_formatters
+	{ {
+		{"DATETIME", "%c", "Full date and time"},
+		{"DATE", "%x", "Full date"},
+
+		{"DAYW", "%A", "Name of the day in the week"},
+		{"DW", "%a", "Shorthand name for the day in the week"},
+
+		{"DNW", "%u", "Number of the day in the week (monday = 1)"},
+		{"DIW", "%w", "Index of the day in the week (monday = 0)"},
+
+		{"DN", "%j", "Number of the day in the year (January 1 = 001, 3 digits)"},
+
+		{"DD", "%d", "Day in the month (2 digits)"},
+		{"D", "%e", "Day in the month (1 or 2 digits)"},
+
+		{"WN", "%W", "Number of the week in the year (first monday of year: WN = 01, before that: WN = 00, 2 digits)"},
+
+		{"MONTH", "%B", "Name of the month"},
+		{"MON", "%b", "Shorthand name of the month"},
+		{"MM", "%m", "Month in year (2 digits)"},
+
+		{"CCCC", "%C", "Century (4 digits)"},
+
+		{"YYYY", "%Y", "Year (4 digits)"},
+		{"YY", "%y", "Year (2 digits)"},
+
+		// ----------------------------
+		// TODO: Manually add these to the replace functions
+		// {"TZOF", "%z", "Timezone offset (e.g. +0230)"},
+		// {"TZ:OF", "%Ez", "Timezone offset with minute separator (e.g. +02:30)"},
+		// {"TZ", "%Z", "Timezone abbreviation"},
+
+		// -----------------------------
+
+		{"TIME", "%X", "Full time of day"},
+
+		{"HH", "%H", "Hour in day (24-hour clock, 2 digits)"},
+		{"hh", "%I", "Hour in day (12-hour clock, 2 digits)"},
+		{"mm", "%M", "Minute in hour (2 digits)"},
+		{"ss", "%S", "Second in hour (2 digits)"},
+
+		{"ap", "%p", "AM or PM of day"},
+	} };
 
 }

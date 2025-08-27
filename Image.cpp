@@ -327,13 +327,13 @@ namespace Image
 		ImGui::Separator();
 	}
 
-	TimeText::TimeText() : timezones{ current_zone()->name() }
+	DateTimeText::DateTimeText() : timezones{ current_zone()->name() }
 	{
 		text = "hh:mmap TMZCITY";
-		TimeText::CreateTextTexture();
+		DateTimeText::CreateTextTexture();
 	}
 
-	void TimeText::UI()
+	void DateTimeText::UI()
 	{
 		UISettings();
 
@@ -341,6 +341,13 @@ namespace Image
 		changed |= UITimezoneSelector();
 
 		if (ImGui::InputText("Formatting", &text)) CreateTextTexture();
+		ImGui::SameLine();
+
+		static bool show_format_window = false;
+		ImGui::TextDisabled("(?)");
+		if (ImGui::IsItemClicked()) show_format_window = true;
+
+		if (show_format_window) UIFormatWindow(show_format_window);
 
 		changed |= ImGui::Checkbox("LowerCase AM/PM", &lower_am_pm);
 
@@ -365,7 +372,7 @@ namespace Image
 		}
 	}
 
-	bool TimeText::UITimezoneSelector()
+	bool DateTimeText::UITimezoneSelector()
 	{
 		bool changed = false;
 
@@ -451,12 +458,12 @@ namespace Image
 		return changed;
 	}
 
-	void TimeText::CreateTextTexture()
+	void DateTimeText::CreateTextTexture()
 	{
 		const uint32_t color_alpha = text_color >> 24;
 		const uint32_t color_rgb = text_color & 0x00FFFFFF;
 
-		std::string formated_text = UpdateText(DateTime::ReplaceTime(text), timezones, date_time, lower_am_pm);
+		std::string formated_text = FormatDateTime(text, timezones, date_time, lower_am_pm);
 		const std::vector<uint8_t>& bitmap_data = font->CreateTextBitmap(formated_text, line_height, width, height);
 		std::vector<uint32_t> data(bitmap_data.size(), bg_color);
 
@@ -468,6 +475,48 @@ namespace Image
 		}
 
 		CreateTexture(data.data());
+	}
+
+	void DateTimeText::UIFormatWindow(bool& show_format_window) const
+	{
+		if (ImGui::Begin("Formats", &show_format_window))
+		{
+			if (ImGui::BeginTable("Formats", 3, ImGuiTableFlags_Resizable | ImGuiTableFlags_Borders))
+			{
+				ImGui::TableSetupColumn("Format");
+				ImGui::TableSetupColumn("Result");
+				ImGui::TableSetupColumn("Description");
+				ImGui::TableHeadersRow();
+
+				// TODO: Make this a table
+				const local_time time_point = date_time.GetTimePoint();
+				for (const auto& formatter : DateTime::date_time_formatters)
+				{
+					ImGui::TableNextRow();
+
+					ImGui::TableSetColumnIndex(0);
+					ImGui::Text("%s", formatter.custom_format.data());
+
+					ImGui::TableSetColumnIndex(1);
+					ImGui::PushID(formatter.custom_format.data());
+
+					std::string formatted_date_time{ formatter.replacement_format };
+					formatted_date_time = std::vformat("{:" + formatted_date_time += '}', std::make_format_args(time_point));
+					//ImGui::SetNextItemWidth(ImGui::CalcTextSize(formatted_date_time.c_str()).x + ImGui::GetStyle().FramePadding.x * 2.0f);
+					//ImGui::InputText("##test", &formatted_date_time, ImGuiInputTextFlags_ReadOnly);
+					ImGui::Text("%s", formatted_date_time.c_str());
+
+					ImGui::PopID();
+
+					ImGui::TableSetColumnIndex(2);
+					ImGui::Text("%s", formatter.description.data());
+
+				}
+
+				ImGui::EndTable();
+			}
+		}
+		ImGui::End();
 	}
 
 	Canvas::Canvas(Image&& image) : image{ std::move(image) }
@@ -499,7 +548,7 @@ namespace Image
 		render_offset = content_size / 2.0f - ImVec2{ canvas_width, canvas_height } / 2.0f;
 	}
 
-	std::future<void> Canvas::ExportCanvas(std::string&& path) const
+	std::future<void> Canvas::Export(std::string&& path) const
 	{
 		SDL_Renderer* renderer = Renderer::GetRenderer();
 		SDL_SetRenderTarget(renderer, target);

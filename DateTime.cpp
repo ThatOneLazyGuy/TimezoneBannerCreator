@@ -35,60 +35,15 @@ namespace DateTime
 		}
 	}
 
-	std::string ReplaceTime(std::string format)
+	std::string ReplaceDateTime(std::string format)
 	{
 		if (format.empty()) return {};
 
-		constexpr std::array<std::pair<std::string_view, std::string_view>, 25> formatting_replacements
-		{ {
-			{"DATETIME", "%c"}, // Full date and time
-			{"DATE", "%x"}, // Full date
-
-			{"DAYW", "%A"}, // Name of the day in the week
-			{"DW", "%a"}, // Shorthand name for the day in the week
-
-			{"DNW", "%u"}, // Number of the day in the week (monday = 1)
-			{"DIW", "%iw"}, // Index of the day in the week (monday = 0)
-
-			{"DN", "%j"}, // Number of the day in the year (January 1 = 001, 3 digits)
-
-			{"DD", "%d"}, // Day in the month (2 digits)
-			{"D", "%e"}, // Day in the month (1 or 2 digits)
-
-			{"WN", "%W"}, // Number of the week in the year (first monday of year: WN = 01, before that: WN = 00, 2 digits)
-
-			{"MONTH", "%B"}, // Name of the month
-			{"MON", "%b"}, // Shorthand name of the month
-			{"MM", "%m"}, // Month in year (2 digits)
-
-			{"CCCC", "%C"}, // Century (4 digits)
-
-			{"YYYY", "%Y"}, // Year (4 digits)
-			{"YY", "%y"}, // Year (2 digits)
-
-			// ----------------------------
-
-			{"TZOF", "%z"}, // Timezone offset (e.g. +0230)
-			{"TZ:OF", "%Ez"}, // Timezone offset with minute separator (e.g. +02:30)
-			{"TZ", "%Z"}, // Timezone abbreviation
-
-			// -----------------------------
-
-			{"HH", "%H"}, // Hour in day (24-hour clock, 2 digits)
-			{"hh", "%I"}, // Hour in day (12-hour clock, 2 digits)
-			{"mm", "%M"}, // Minute in hour (2 digits)
-			{"ss", "%S"}, // Second in hour (2 digits)
-
-			{"ap", "%p"}, // AM or PM of day
-
-			{"time", "%X"} // Full time of day
-		} };
-
 		for (size_t i = 0; i < format.size(); i++)
 		{
-			for (const auto& [replace, with] : formatting_replacements)
+			for (const auto& [custom_format, replacement_format, explanation] : date_time_formatters)
 			{
-				i += Replace(format, i, replace, with);
+				i += Replace(format, i, custom_format, replacement_format);
 			}
 
 		}
@@ -96,11 +51,11 @@ namespace DateTime
 		return format;
 	}
 
-	std::string UpdateText(const std::string& format, const std::vector<std::string_view>& selected_timezones, const DateTime& date_time, const bool lower_am_pm)
+	std::string FormatDateTime(const std::string& string, const std::vector<std::string_view>& selected_timezones, const DateTime& date_time, const bool lower_am_pm)
 	{
-		using namespace std::chrono;
+		if (string.empty()) return "";
 
-		if (format.empty()) return "";
+		const std::string format = ReplaceDateTime(string);
 
 		std::string text;
 		for (size_t i = 0; i < selected_timezones.size(); i++)

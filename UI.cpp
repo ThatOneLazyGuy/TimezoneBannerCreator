@@ -151,7 +151,7 @@ namespace UI
 
 				if (ImGui::MenuItem("Text")) Image::images.push_back(std::make_unique<Image::Text>());
 
-				if (ImGui::MenuItem("TimeText")) Image::images.push_back(std::make_unique<Image::TimeText>());
+				if (ImGui::MenuItem("DateTime Text")) Image::images.push_back(std::make_unique<Image::DateTimeText>());
 
 				ImGui::EndMenu();
 			}
@@ -368,7 +368,7 @@ namespace UI
 				const std::filesystem::path result = pfd::save_file{ "Export png", "", {"PNG image", "*.png"} }.result();
 				if (!result.empty())
 				{
-					export_future = Image::canvas->ExportCanvas(result.generic_string());
+					export_future = Image::canvas->Export(result.generic_string());
 				}
 			}
 
